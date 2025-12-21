@@ -2,6 +2,8 @@
 
 A comprehensive template for building cross-platform desktop applications using Tauri with full Windows 7, 10, 11, and macOS support. This template demonstrates how to configure Tauri with React and TypeScript while maintaining compatibility with both legacy and modern operating systems.
 
+**中文文档**: [README_CN.md](./README_CN.md)
+
 ## 🚀 Features
 
 - **Cross-Platform Support**: Full compatibility with Windows 7, 10, 11, and macOS
@@ -51,7 +53,23 @@ rustup default 1.77.2
 rustc --version  # Should show 1.77.2
 ```
 
-#### Step 2: Build Dependencies
+#### Step 2: Download WebView2 Runtime (Manual)
+
+Download the fixed WebView2 runtime version that supports Windows 7:
+- [WebView2 Runtime Archive](https://github.com/westinyang/WebView2RuntimeArchive/releases/tag/109.0.1518.78)
+
+Download the following file:
+- `Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.x64.cab`
+
+#### Step 3: Extract Runtime to Project
+
+Extract the runtime files to your project's `src-tauri` directory:
+
+```powershell
+Expand .\Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.x64.cab -F:* ./src-tauri
+```
+
+#### Step 4: Build Dependencies
 
 Build native dependencies to resolve compatibility issues:
 
