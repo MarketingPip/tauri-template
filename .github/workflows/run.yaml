@@ -68,21 +68,10 @@ jobs:
       - name: Build Tauri Application
         run: pnpm tauri build
 
-      - name: Commit and Push Build Results
-        shell: pwsh
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Force add files inside the git-ignored target directory
-          git add -f src-tauri/target/release/bundle/*
-          
-          # Check if there are actual changes staged to commit
-          $status = git status --porcelain
-          if ($status) {
-              git commit -m "chore(build): auto-update Tauri build artifacts [skip ci]"
-              git push
-              Write-Host "Successfully committed and pushed build artifacts!"
-          } else {
-              Write-Host "No changes detected in build bundles to commit."
-          }
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-windows-installers
+          path: |
+           src-tauri/target/release/bundle/msi/*.msi
+           src-tauri/target/release/bundle/nsis/*.exe
