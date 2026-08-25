@@ -37,23 +37,16 @@ jobs:
       - name: Download and Extract WebView2 Runtime (.cab)
         shell: pwsh
         run: |
-          $cabUrl = "https://msedge.sf.dl.delivery.mp.microsoft.com/filestreaming/files/2c3a50bc-59d4-4632-a5e6-bb7c1b1c3c9c/Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.x64.cab"
-          # Fallback link or direct package download URL if needed. Let's use a robust method:
           $targetDir = "src-tauri\Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.x64"
           
           if (!(Test-Path $targetDir)) {
               New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
-              Write-Host "Downloading WebView2 Fixed Version CAB..."
-              $cabPath = "webview2.cab"
-              
-              # Official Microsoft Evergreen/Fixed CDN pattern or NuGet package extraction fix:
-              # Let's download directly from NuGet package zip content where the files reside:
+              Write-Host "Downloading WebView2 Fixed Version package..."
               $nugetUrl = "https://www.nuget.org/api/v2/package/WebView2.Runtime.X64/109.0.1518.78"
               Invoke-WebRequest -Uri $nugetUrl -OutFile "webview2.zip"
               
               Expand-Archive -Path "webview2.zip" -DestinationPath "webview2_temp" -Force
               
-              # Find where the actual binaries (msedgewebview2.exe) are located inside the NuGet unzipped folders
               $sourceBin = Get-ChildItem -Path "webview2_temp" -Recurse -Filter "msedgewebview2.exe" | Select-Object -First 1
               
               if ($sourceBin) {
@@ -76,8 +69,20 @@ jobs:
         run: pnpm tauri build
 
       - name: Commit and Push Build Results
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore(build): auto-update Tauri build artifacts [skip ci]"
-          file_pattern: "src-tauri/target/release/bundle/*"
-          branch: ${{ github.ref_name }}
+        shell: pwsh
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Force add files inside the git-ignored target directory
+          git add -f src-tauri/target/release/bundle/*
+          
+          # Check if there are actual changes staged to commit
+          $status = git status --porcelain
+          if ($status) {
+              git commit -m "chore(build): auto-update Tauri build artifacts [skip ci]"
+              git push
+              Write-Host "Successfully committed and pushed build artifacts!"
+          } else {
+              Write-Host "No changes detected in build bundles to commit."
+          }
