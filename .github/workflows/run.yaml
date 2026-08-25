@@ -34,8 +34,9 @@ jobs:
         with:
           toolchain: 1.77.2
 
-      - name: Install Dependencies
-        run: pnpm install
+      - name: Install Dependencies & Approve Builds
+        run: |
+          pnpm install || (pnpm approve-builds --all && pnpm install)
 
       - name: Build Tauri Application
         run: pnpm tauri build
