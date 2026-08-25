@@ -37,12 +37,12 @@ jobs:
       - name: Download and Extract WebView2 Runtime (.cab)
         shell: pwsh
         run: |
-          $targetDir = "src-tauri\Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.x64"
+          $targetDir = "src-tauri\Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.x86"
           
           if (!(Test-Path $targetDir)) {
               New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
               Write-Host "Downloading WebView2 Fixed Version package..."
-              $nugetUrl = "https://www.nuget.org/api/v2/package/WebView2.Runtime.X64/109.0.1518.78"
+              $nugetUrl = "https://www.nuget.org/api/v2/package/WebView2.Runtime.X86/109.0.1518.78"
               Invoke-WebRequest -Uri $nugetUrl -OutFile "webview2.zip"
               
               Expand-Archive -Path "webview2.zip" -DestinationPath "webview2_temp" -Force
