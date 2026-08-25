@@ -26,13 +26,42 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 23
           cache: 'pnpm'
 
       - name: Set up Rust Toolchain (1.77.2 for Windows 7 Compatibility)
         uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: 1.77.2
+
+      - name: Download and Extract WebView2 Runtime for Windows 7
+        shell: pwsh
+        run: |
+          $nugetUrl = "https://www.nuget.org/api/v2/package/WebView2.Runtime.X64/109.0.1518.78"
+          $zipPath = "webview2.zip"
+          $extractPath = "webview2_extracted"
+          
+          Write-Host "Downloading WebView2 Runtime from NuGet..."
+          Invoke-WebRequest -Uri $nugetUrl -OutFile $zipPath
+          
+          Write-Host "Extracting package..."
+          Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+          
+          # Find the runtime directory inside the extracted contents
+          $sourceDir = Get-ChildItem -Path $extractPath -Recurse -Filter "Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.x64" | Select-Object -ExpandProperty FullName
+          
+          if ($sourceDir) {
+              Write-Host "Found runtime at: $sourceDir"
+              $destDir = "src-tauri\Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.x64"
+              if (!(Test-Path $destDir)) {
+                  Copy-Item -Path $sourceDir -Destination "src-tauri\" -Recurse -Force
+                  Write-Host "Copied runtime to src-tauri\"
+              } else {
+                  Write-Host "Runtime already exists in src-tauri\"
+              }
+          } else {
+              throw "Could not find WebView2 Fixed Version Runtime folder in the extracted package."
+          }
 
       - name: Install Dependencies & Approve Builds
         run: |
