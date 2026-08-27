@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 23
-          cache: 'pnpm'
+          # cache: 'pnpm'
 
       - name: Set up Rust Toolchain (32-bit / i686)
         uses: dtolnay/rust-toolchain@v1
