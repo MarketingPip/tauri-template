@@ -33,7 +33,7 @@
     ],
     "windows": {
       "webviewInstallMode": {
-        "type": "fixedRuntime",
+        "type": "embedBootstrapper",
         "path": "./Microsoft.WebView2.FixedVersionRuntime.109.0.1518.78.x86/"
       }
     }
